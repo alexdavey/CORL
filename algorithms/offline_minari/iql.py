@@ -37,7 +37,7 @@ class TrainConfig:
     # wandb run name
     name: str = "IQL"
     # training dataset and evaluation environment
-    env: str = "D4RL/pen/human-v1"
+    env: str = "D4RL/pen/human-v2"
     # discount factor
     discount: float = 0.99
     # coefficient for the target critic Polyak's update
@@ -117,7 +117,7 @@ def wrap_env(
         # Please be careful, here reward is multiplied by scale!
         return reward_scale * reward
 
-    env = gym.wrappers.TransformObservation(env, normalize_state)
+    env = gym.wrappers.TransformObservation(env, normalize_state, env.observation_space)
     if reward_scale != 1.0:
         env = gym.wrappers.TransformReward(env, scale_reward)
     return env
@@ -205,7 +205,11 @@ def qlearning_dataset(dataset: minari.MinariDataset) -> Dict[str, np.ndarray]:
     }
 
 
-def set_seed(seed: int, deterministic_torch: bool = False):
+def set_seed(
+    seed: int, env: Optional[gym.Env] = None, deterministic_torch: bool = False
+):
+    if env is not None:
+        env.action_space.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
     random.seed(seed)
@@ -599,7 +603,7 @@ def train(config: TrainConfig):
 
     # Set seeds
     seed = config.seed
-    set_seed(seed)
+    set_seed(seed, env)
 
     q_network = TwinQ(state_dim, action_dim).to(config.device)
     v_network = ValueFunction(state_dim).to(config.device)
@@ -664,19 +668,15 @@ def train(config: TrainConfig):
             )
             eval_score = eval_scores.mean()
             wandb.log({"evaluation_return": eval_score}, step=trainer.total_it)
-            # optional normalized score logging, only if dataset has reference scores
-            normalized_eval_score = None
-            with contextlib.suppress(ValueError):
-                normalized_eval_score = (
-                    minari.get_normalized_score(dataset, eval_scores).mean() * 100
-                )
-                wandb.log({"normalized_score": normalized_eval_score}, step=trainer.total_it)
             print("---------------------------------------")
-            print(f"Evaluation over {config.n_episodes} episodes: ")
-            if normalized_eval_score is not None:
-                print(f"{eval_score:.3f} , D4RL score: {normalized_eval_score:.3f}")
-            else:
-                print(f"{eval_score:.3f}")
+            print(f"Evaluation over {config.n_episodes} episodes: {eval_score:.3f}")
+            # optional normalized score logging, only if dataset has reference scores
+            with contextlib.suppress(ValueError):
+                normalized_score = (
+                    minari.get_normalized_score(minari_dataset, eval_scores).mean() * 100
+                )
+                wandb.log({"normalized_score": normalized_score}, step=trainer.total_it)
+                print(f"Normalized score: {normalized_score:.3f}")
             print("---------------------------------------")
             if config.checkpoints_path is not None:
                 torch.save(
