@@ -9,7 +9,6 @@ frac: 1.0
 group: bc-minari-pen-human-v2-v0
 load_model: ''
 max_timesteps: 1000000
-max_traj_len: 1000
 n_episodes: 10
 name: BC
 normalize: true
