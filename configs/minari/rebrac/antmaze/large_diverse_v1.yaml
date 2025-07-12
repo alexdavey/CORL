@@ -7,12 +7,12 @@ critic_bc_coef: 0.002
 critic_learning_rate: 0.00005
 critic_ln: true
 critic_n_hiddens: 3
-dataset_name: antmaze-large-diverse-v2
+dataset_name: D4RL/antmaze/large-diverse-v1
 eval_episodes: 100
 eval_every: 50
 eval_seed: 42
 gamma: 0.999
-group: rebrac-antmaze-large-diverse-v2
+group: rebrac-minari-antmaze-large-diverse-v1-multiseed-v0
 hidden_dim: 256
 name: rebrac
 noise_clip: 0.5

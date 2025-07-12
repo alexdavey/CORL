@@ -6,7 +6,7 @@ discount: 0.99
 env: D4RL/pen/human-v2
 eval_freq: 5000
 frac: 1.0
-group: bc-minari-pen-human-v2-v0
+group: bc-minari-pen-human-v2-multiseed-v0
 load_model: ''
 max_timesteps: 1000000
 n_episodes: 10

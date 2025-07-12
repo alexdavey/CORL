@@ -4,10 +4,10 @@ buffer_size: 10000000
 checkpoints_path: null
 deterministic_torch: true
 device: cuda
-env_name: walker2d-medium-v2
+env_name: mujoco/walker2d/medium-v0
 eval_frequency: 1000
 gamma: 0.99
-group: awac-walker2d-medium-v2-multiseed-v0
+group: awac-minari-walker2d-medium-v0-multiseed-v0
 hidden_dim: 256
 learning_rate: 0.0003
 n_test_episodes: 10

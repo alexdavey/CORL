@@ -4,10 +4,10 @@ buffer_size: 10000000
 checkpoints_path: null
 deterministic_torch: false
 device: cuda
-env_name: relocate-cloned-v1
+env_name: D4RL/relocate/cloned-v2
 eval_frequency: 1000
 gamma: 0.99
-group: awac-relocate-cloned-v1-multiseed-v0
+group: awac-minari-relocate-cloned-v2-multiseed-v0
 hidden_dim: 256
 learning_rate: 0.0003
 n_test_episodes: 10

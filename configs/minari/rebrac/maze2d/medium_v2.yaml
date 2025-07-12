@@ -7,12 +7,12 @@ critic_bc_coef: 0.001
 critic_learning_rate: 0.0003
 critic_ln: true
 critic_n_hiddens: 3
-dataset_name: maze2d-medium-v1
+dataset_name: D4RL/maze2d/medium-v2
 eval_episodes: 100
 eval_every: 5
 eval_seed: 42
 gamma: 0.99
-group: rebrac-maze2d-medium-v1
+group: rebrac-minari-maze2d-medium-v2-multiseed-v0
 hidden_dim: 256
 name: rebrac
 noise_clip: 0.5
