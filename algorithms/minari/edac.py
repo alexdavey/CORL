@@ -101,13 +101,39 @@ def wandb_init(config: dict) -> None:
     wandb.run.save()
 
 
+# Convert GoalEnv dict observation to array [pos_xy, vector_to_goal, other_obs]
+def process_goalenv_obs(obs):
+    return np.concatenate([
+        obs["achieved_goal"],
+        obs["desired_goal"] - obs["achieved_goal"],
+        obs["observation"]
+    ], axis=-1)
+
+
+def wrap_goalenv(env):
+    achieved_goal = env.observation_space["achieved_goal"]
+    desired_goal = env.observation_space["desired_goal"]
+    observation = env.observation_space["observation"]
+    direction_low = desired_goal.low - achieved_goal.high
+    direction_high = desired_goal.high - achieved_goal.low
+    new_obs_space = gym.spaces.Box(
+        low=np.concatenate([achieved_goal.low, direction_low, observation.low]),
+        high=np.concatenate([achieved_goal.high, direction_high, observation.high])
+    )
+    env = gym.wrappers.TransformObservation(env, process_goalenv_obs, new_obs_space)
+    return env
+
+
 # WARN: this will load full dataset in memory (which is OK for D4RL datasets)
 def qlearning_dataset(dataset: minari.MinariDataset) -> Dict[str, np.ndarray]:
     obs, next_obs, actions, rewards, dones = [], [], [], [], []
 
     for episode in dataset:
-        obs.append(episode.observations[:-1].astype(np.float32))
-        next_obs.append(episode.observations[1:].astype(np.float32))
+        ep_obs = episode.observations
+        if isinstance(episode.observations, dict):
+            ep_obs = process_goalenv_obs(ep_obs)
+        obs.append(ep_obs[:-1].astype(np.float32))
+        next_obs.append(ep_obs[1:].astype(np.float32))
         actions.append(episode.actions.astype(np.float32))
         rewards.append(episode.rewards)
         dones.append(episode.terminations)
@@ -590,7 +616,12 @@ def train(config: TrainConfig):
 
     # data, evaluation, env setup
     minari_dataset = minari.load_dataset(config.env_name, download=True)
-    eval_env = wrap_env(minari_dataset.recover_environment(eval_env=True))
+
+    eval_env = minari_dataset.recover_environment(eval_env=True)
+    if isinstance(eval_env.observation_space, gym.spaces.Dict):
+        eval_env = wrap_goalenv(eval_env)
+    eval_env = wrap_env(eval_env)
+
     state_dim = eval_env.observation_space.shape[0]
     action_dim = eval_env.action_space.shape[0]
 
