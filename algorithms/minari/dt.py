@@ -148,6 +148,28 @@ def discounted_cumsum(x: np.ndarray, gamma: float) -> np.ndarray:
         cumsum[t] = x[t] + gamma * cumsum[t + 1]
     return cumsum
 
+# Convert GoalEnv dict observation to array [pos_xy, vector_to_goal, other_obs]
+def process_goalenv_obs(obs):
+    return np.concatenate([
+        obs["achieved_goal"],
+        obs["desired_goal"] - obs["achieved_goal"],
+        obs["observation"]
+    ], axis=-1)
+
+
+def wrap_goalenv(env):
+    achieved_goal = env.observation_space["achieved_goal"]
+    desired_goal = env.observation_space["desired_goal"]
+    observation = env.observation_space["observation"]
+    direction_low = desired_goal.low - achieved_goal.high
+    direction_high = desired_goal.high - achieved_goal.low
+    new_obs_space = gym.spaces.Box(
+        low=np.concatenate([achieved_goal.low, direction_low, observation.low]),
+        high=np.concatenate([achieved_goal.high, direction_high, observation.high])
+    )
+    env = gym.wrappers.TransformObservation(env, process_goalenv_obs, new_obs_space)
+    return env
+
 
 def load_trajectories(
     minari_dataset: minari.MinariDataset, gamma: float = 1.0
@@ -159,7 +181,10 @@ def load_trajectories(
 
     # TODO: Check off-by-one
     for episode in minari_dataset:
-        obs.append(episode.observations.astype(np.float32))
+        ep_obs = episode.observations
+        if isinstance(episode.observations, dict):
+            ep_obs = process_goalenv_obs(ep_obs)
+        obs.append(ep_obs.astype(np.float32))
         actions.append(episode.actions.astype(np.float32))
         rewards.append(episode.rewards)
         timeouts.append(episode.truncations)
@@ -465,8 +490,11 @@ def train(config: TrainConfig):
         num_workers=config.num_workers,
     )
     # evaluation environment with state & reward preprocessing (as in dataset above)
+    eval_env = minari_dataset.recover_environment(eval_env=True)
+    if isinstance(eval_env.observation_space, gym.spaces.Dict):
+        env = wrap_goalenv(eval_env)
     eval_env = wrap_env(
-        env=minari_dataset.recover_environment(eval_env=True),
+        env=eval_env,
         state_mean=dataset.state_mean,
         state_std=dataset.state_std,
         reward_scale=config.reward_scale,
