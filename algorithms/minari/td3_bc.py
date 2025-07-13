@@ -26,7 +26,7 @@ class TrainConfig:
     # wandb project name
     project: str = "CORL"
     # wandb group name
-    group: str = "TD3_BC-Minari"
+    group: str = "TD3-BC-Minari"
     # wandb run name
     name: str = "TD3_BC"
     # training dataset and evaluation environment

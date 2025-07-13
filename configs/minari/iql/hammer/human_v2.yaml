@@ -13,7 +13,7 @@ iql_tau: 0.8
 load_model: ''
 max_timesteps: 1000000
 n_episodes: 10
-name: IQL-Minari
+name: IQL
 normalize: true
 normalize_reward: false
 qf_lr: 3e-4
