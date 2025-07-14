@@ -9,12 +9,12 @@ deterministic_torch: false
 device: cuda
 embedding_dim: 128
 embedding_dropout: 0.1
-env_name: mujoco/hopper/medium-replay-v0
+env_name: mujoco/hopper/simple-replay-v0
 episode_len: 1000
 eval_episodes: 100
 eval_every: 5000
 eval_seed: 42
-group: dt-minari-hopper-medium-replay-v0-multiseed-v2
+group: dt-minari-hopper-simple-replay-v0-multiseed-v2
 learning_rate: 0.0008
 max_action: 1.0
 name: DT

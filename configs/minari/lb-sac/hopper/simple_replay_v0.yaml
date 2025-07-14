@@ -8,12 +8,12 @@ critic_learning_rate: 0.0018
 deterministic_torch: false
 device: сuda
 edac_init: false
-env_name: mujoco/hopper/medium-replay-v0
+env_name: mujoco/hopper/simple-replay-v0
 eval_episodes: 10
 eval_every: 5
 eval_seed: 42
 gamma: 0.99
-group: lb-sac-minari-hopper-medium-replay-v0-multiseed-v0
+group: lb-sac-minari-hopper-simple-replay-v0-multiseed-v0
 hidden_dim: 256
 log_every: 100
 max_action: 1.0
