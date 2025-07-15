@@ -875,7 +875,7 @@ class ContinuousCQL:
 @pyrallis.wrap()
 def train(config: TrainConfig):
     minari_dataset = minari.load_dataset(config.env, download=True)
-    env = minari_dataset.recover_environment(eval_env=True)
+    env = minari_dataset.recover_environment()
 
     if isinstance(env.observation_space, gym.spaces.Dict):
         env = wrap_goalenv(env)
