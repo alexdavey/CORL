@@ -490,7 +490,7 @@ def train(config: TrainConfig):
         num_workers=config.num_workers,
     )
     # evaluation environment with state & reward preprocessing (as in dataset above)
-    eval_env = minari_dataset.recover_environment(eval_env=True)
+    eval_env = minari_dataset.recover_environment()
     if isinstance(eval_env.observation_space, gym.spaces.Dict):
         env = wrap_goalenv(eval_env)
     eval_env = wrap_env(
