@@ -564,7 +564,7 @@ def train(config: TrainConfig):
     # data, evaluation, env setup
     minari_dataset = minari.load_dataset(config.env_name, download=True)
 
-    eval_env = minari_dataset.recover_environment(eval_env=True)
+    eval_env = minari_dataset.recover_environment()
     if isinstance(eval_env.observation_space, gym.spaces.Dict):
         eval_env = wrap_goalenv(eval_env)
     eval_env = wrap_env(eval_env)
