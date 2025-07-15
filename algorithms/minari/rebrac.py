@@ -352,7 +352,7 @@ def normalize(
 
 
 def make_env(minari_dataset: minari.MinariDataset, seed: int) -> gym.Env:
-    env = minari_dataset.recover_environment(eval_env=True)
+    env = minari_dataset.recover_environment()
     if isinstance(env.observation_space, gym.spaces.Dict):
         env = wrap_goalenv(env)
     env.action_space.seed(seed)
